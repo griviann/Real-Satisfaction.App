@@ -2,42 +2,38 @@ package com.ncorti.kotlin.template.app
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
-import com.ncorti.kotlin.template.app.databinding.ActivityMainBinding
-import com.ncorti.kotlin.template.library.FactorialCalculator
-import com.ncorti.kotlin.template.library.android.ToastUtil
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityMainBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.buttonCompute.setOnClickListener {
-            val message = if (binding.editTextFactorial.text.isNotEmpty()) {
-                val input = binding.editTextFactorial.text.toString().toLong()
-                val result = try {
-                    FactorialCalculator.computeFactorial(input).toString()
-                } catch (ex: IllegalStateException) {
-                    "Error: ${ex.message}"
-                }
-
-                binding.textResult.text = result
-                binding.textResult.visibility = View.VISIBLE
-                getString(R.string.notification_title, result)
-            } else {
-                getString(R.string.please_enter_a_number)
-            }
-            ToastUtil.showToast(this, message)
+        
+        val layout = LinearLayout(this).apply{
+            orientation = LinearLayout.VERTICAL
+            setPadding(60,200,60,60)
         }
 
-        binding.buttonAppcompose.setOnClickListener {
-            val intent = Intent(it.context, ComposeActivity::class.java)
-            startActivity(intent)
+        val btnPermission = Button(this).apply{ 
+            text = "1. Allow Overlay Permission" 
         }
+        val btnStart = Button(this).apply{ 
+            text = "2. Start Real Satisfaction Bubble" 
+        }
+
+        btnPermission.setOnClickListener{
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+        }
+        btnStart.setOnClickListener{
+            startService(Intent(this, FloatingService::class.java))
+        }
+
+        layout.addView(btnPermission, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply{bottomMargin=50})
+        layout.addView(btnStart, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        
+        setContentView(layout)
     }
 }
